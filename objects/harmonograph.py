@@ -4,7 +4,7 @@ from PySide2.QtWidgets import *
 from time import sleep
 from matplotlib import cm
 import numpy as np
-from random import randint
+from random import randint, random
 try:
     from objects.generator import Generator
 except:
@@ -31,7 +31,6 @@ class Harmonograph(Generator):
         self.running = True
         while self.running:
             self.step()
-            # sleep(.01)
             if self.depth > 100:
                 self.running = False
 
@@ -70,22 +69,22 @@ class Harmonograph(Generator):
     def randomize(self):
         for i in range(1, 5):
             amp = getattr(self, "amp" + str(i) + "_box")
-            r = randint(0, 1000)
+            r = randint(200, 400)
             amp.setValue(r)
             getattr(self, "set_amp" + str(i))(r)
 
             freq = getattr(self, "freq" + str(i) + "_box")
-            r = randint(0, 40)
+            r = random()*20
             freq.setValue(r)
             getattr(self, "set_freq" + str(i))(r)
 
             phase = getattr(self, "phase" + str(i) + "_box")
-            r = randint(0, 360)
+            r = randint(0, 180)
             phase.setValue(r)
             getattr(self, "set_phase" + str(i))(r)
 
             decay = getattr(self, "decay" + str(i) + "_box")
-            r = randint(0, 100)
+            r = random()/100
             decay.setValue(r)
             getattr(self, "set_decay" + str(i))(r)
 
@@ -94,17 +93,17 @@ class Harmonograph(Generator):
         l2 = QGridLayout()
         l3 = QGridLayout()
         l4 = QGridLayout()
-        self.p1_group = QGroupBox("Pendulum 1")
+        self.p1_group = QGroupBox("Pendulum 1 (X)")
         self.p1_group.setLayout(l1)
         self.p1_group.setCheckable(True)
-        self.p2_group = QGroupBox("Pendulum 2")
+        self.p2_group = QGroupBox("Pendulum 2 (X)")
         self.p2_group.setLayout(l2)
         self.p2_group.setCheckable(True)
         self.p2_group.setChecked(False)
-        self.p3_group = QGroupBox("Pendulum 3")
+        self.p3_group = QGroupBox("Pendulum 3 (Y)")
         self.p3_group.setLayout(l3)
         self.p3_group.setCheckable(True)
-        self.p4_group = QGroupBox("Pendulum 4")
+        self.p4_group = QGroupBox("Pendulum 4 (Y)")
         self.p4_group.setLayout(l4)
         self.p4_group.setCheckable(True)
         self.p4_group.setChecked(False)
@@ -112,11 +111,11 @@ class Harmonograph(Generator):
         self.amp1_label = QLabel("Amplitude:")
         self.amp1_box = QSpinBox()
         self.freq1_label = QLabel("Frequency (hz):")
-        self.freq1_box = QSpinBox()
+        self.freq1_box = QDoubleSpinBox()
         self.phase1_label = QLabel("Phase (deg):")
         self.phase1_box = QSpinBox()
         self.decay1_label = QLabel("Decay:")
-        self.decay1_box = QSpinBox()
+        self.decay1_box = QDoubleSpinBox()
         l1.addWidget(self.amp1_label, 0, 0)
         l1.addWidget(self.amp1_box, 0, 1)
         l1.addWidget(self.freq1_label, 1, 0)
@@ -129,11 +128,11 @@ class Harmonograph(Generator):
         self.amp2_label = QLabel("Amplitude:")
         self.amp2_box = QSpinBox()
         self.freq2_label = QLabel("Frequency (hz):")
-        self.freq2_box = QSpinBox()
+        self.freq2_box = QDoubleSpinBox()
         self.phase2_label = QLabel("Phase (deg):")
         self.phase2_box = QSpinBox()
         self.decay2_label = QLabel("Decay:")
-        self.decay2_box = QSpinBox()
+        self.decay2_box = QDoubleSpinBox()
         l2.addWidget(self.amp2_label, 0, 0)
         l2.addWidget(self.amp2_box, 0, 1)
         l2.addWidget(self.freq2_label, 1, 0)
@@ -146,11 +145,11 @@ class Harmonograph(Generator):
         self.amp3_label = QLabel("Amplitude:")
         self.amp3_box = QSpinBox()
         self.freq3_label = QLabel("Frequency (hz):")
-        self.freq3_box = QSpinBox()
+        self.freq3_box = QDoubleSpinBox()
         self.phase3_label = QLabel("Phase (deg):")
         self.phase3_box = QSpinBox()
         self.decay3_label = QLabel("Decay:")
-        self.decay3_box = QSpinBox()
+        self.decay3_box = QDoubleSpinBox()
         l3.addWidget(self.amp3_label, 0, 0)
         l3.addWidget(self.amp3_box, 0, 1)
         l3.addWidget(self.freq3_label, 1, 0)
@@ -163,11 +162,11 @@ class Harmonograph(Generator):
         self.amp4_label = QLabel("Amplitude:")
         self.amp4_box = QSpinBox()
         self.freq4_label = QLabel("Frequency (hz):")
-        self.freq4_box = QSpinBox()
+        self.freq4_box = QDoubleSpinBox()
         self.phase4_label = QLabel("Phase (deg):")
         self.phase4_box = QSpinBox()
         self.decay4_label = QLabel("Decay:")
-        self.decay4_box = QSpinBox()
+        self.decay4_box = QDoubleSpinBox()
         l4.addWidget(self.amp4_label, 0, 0)
         l4.addWidget(self.amp4_box, 0, 1)
         l4.addWidget(self.freq4_label, 1, 0)
@@ -190,14 +189,10 @@ class Harmonograph(Generator):
             'gist_rainbow', 'rainbow', 'jet', 'nipy_spectral', 'gist_ncar'])
         self.size_label = QLabel("Pen size:")
         self.size_box = QSpinBox()
-        self.decay_label = QLabel("Decay rate (%):")
-        self.decay_box = QSpinBox()
         l.addWidget(self.cmap_label, 0, 0)
         l.addWidget(self.cmap_box, 0, 1)
         l.addWidget(self.size_label, 1, 0)
         l.addWidget(self.size_box, 1, 1)
-        # l.addWidget(self.decay_label, 2, 0)
-        # l.addWidget(self.decay_box, 2, 1)
         l.addWidget(self.p1_group, 3, 0, 1, 2)
         l.addWidget(self.p2_group, 4, 0, 1, 2)
         l.addWidget(self.p3_group, 5, 0, 1, 2)
@@ -216,71 +211,65 @@ class Harmonograph(Generator):
         self.size_box.valueChanged.connect(self.set_size)
         self.pen_size = 5
 
-        # self.decay_box.setMinimum(0)
-        # self.decay_box.setMaximum(100)
-        # self.decay_box.setValue(5)
-        # self.decay_box.valueChanged.connect(self.set_decay)
-        # self.decay = -.05
-
         self.p1_group.clicked.connect(self.toggle_p1)
         self.amp1_box.valueChanged.connect(self.set_amp1)
-        self.amp1_box.setMinimum(0); self.amp1_box.setMaximum(1000); self.amp1_box.setValue(300)
+        self.amp1_box.setMinimum(300); self.amp1_box.setMaximum(400); self.amp1_box.setValue(400)
         self.freq1_box.valueChanged.connect(self.set_freq1)
-        self.freq1_box.setMinimum(0); self.freq1_box.setMaximum(40); self.freq1_box.setValue(2)
+        self.freq1_box.setMinimum(1); self.freq1_box.setMaximum(20); self.freq1_box.setValue(2)
         self.phase1_box.valueChanged.connect(self.set_phase1)
-        self.phase1_box.setMinimum(0); self.phase1_box.setMaximum(360); self.phase1_box.setValue(0)
+        self.phase1_box.setMinimum(0); self.phase1_box.setMaximum(180); self.phase1_box.setValue(0)
         self.decay1_box.valueChanged.connect(self.set_decay1)
-        self.decay1_box.setMinimum(0); self.decay1_box.setMaximum(100); self.decay1_box.setValue(5)
+        self.decay1_box.setMinimum(0); self.decay1_box.setMaximum(.01); self.decay1_box.setValue(.002)
         self.p1 = True
         self.amp1 = 300
-        self.freq1 = 2 * 2 / np.pi
+        self.freq1 = 2
         self.phase1 = 0
-        self.decay1 = -5/200
+        self.decay1 = -.002
 
         self.p2_group.clicked.connect(self.toggle_p2)
         self.amp2_box.valueChanged.connect(self.set_amp2)
-        self.amp2_box.setMinimum(0); self.amp2_box.setMaximum(1000); self.amp2_box.setValue(150)
+        self.amp2_box.setMinimum(200); self.amp2_box.setMaximum(300); self.amp2_box.setValue(200)
         self.freq2_box.valueChanged.connect(self.set_freq2)
-        self.freq2_box.setMinimum(0); self.freq2_box.setMaximum(40); self.freq2_box.setValue(4)
+        self.freq2_box.setMinimum(1); self.freq2_box.setMaximum(20); self.freq2_box.setValue(4)
         self.phase2_box.valueChanged.connect(self.set_phase2)
-        self.phase2_box.setMinimum(0); self.phase2_box.setMaximum(360); self.phase2_box.setValue(0)
+        self.phase2_box.setMinimum(0); self.phase2_box.setMaximum(180); self.phase2_box.setValue(0)
         self.decay2_box.valueChanged.connect(self.set_decay2)
-        self.decay2_box.setMinimum(0); self.decay2_box.setMaximum(100); self.decay2_box.setValue(5)
+        self.decay2_box.setMinimum(0); self.decay2_box.setMaximum(.01); self.decay2_box.setValue(.002)
         self.p2 = False
         self.amp2 = 150
-        self.freq2 = 4 * 2 / np.pi
+        self.freq2 = 4
         self.phase2 = 0
-        self.decay2 = -5/200
+        self.decay2 = -.002
 
         self.p3_group.clicked.connect(self.toggle_p3)
         self.amp3_box.valueChanged.connect(self.set_amp3)
-        self.amp3_box.setMinimum(0); self.amp3_box.setMaximum(1000); self.amp3_box.setValue(300)
+        self.amp3_box.setMinimum(300); self.amp3_box.setMaximum(400); self.amp3_box.setValue(400)
         self.freq3_box.valueChanged.connect(self.set_freq3)
-        self.freq3_box.setMinimum(0); self.freq3_box.setMaximum(40); self.freq3_box.setValue(2)
+        self.freq3_box.setMinimum(1); self.freq3_box.setMaximum(20); self.freq3_box.setValue(2)
         self.phase3_box.valueChanged.connect(self.set_phase3)
-        self.phase3_box.setMinimum(0); self.phase3_box.setMaximum(360); self.phase3_box.setValue(0)
+        self.phase3_box.setMinimum(0); self.phase3_box.setMaximum(180); self.phase3_box.setValue(0)
         self.decay3_box.valueChanged.connect(self.set_decay3)
-        self.decay3_box.setMinimum(0); self.decay3_box.setMaximum(100); self.decay3_box.setValue(5)
+        self.decay3_box.setMinimum(0); self.decay3_box.setMaximum(.01); self.decay3_box.setValue(.002)
         self.p3 = True
         self.amp3 = 300
-        self.freq3 = 2 * 2 / np.pi
+        self.freq3 = 2
         self.phase3 = 0
-        self.decay3 = -5/200
+        self.decay3 = -.002
 
         self.p4_group.clicked.connect(self.toggle_p4)
         self.amp4_box.valueChanged.connect(self.set_amp4)
-        self.amp4_box.setMinimum(0); self.amp4_box.setMaximum(1000); self.amp4_box.setValue(150)
+        self.amp4_box.setMinimum(200); self.amp4_box.setMaximum(300); self.amp4_box.setValue(200)
         self.freq4_box.valueChanged.connect(self.set_freq4)
-        self.freq4_box.setMinimum(0); self.freq4_box.setMaximum(40); self.freq4_box.setValue(4)
+        self.freq4_box.setMinimum(1); self.freq4_box.setMaximum(20); self.freq4_box.setValue(4)
         self.phase4_box.valueChanged.connect(self.set_phase4)
-        self.phase4_box.setMinimum(0); self.phase4_box.setMaximum(360); self.phase4_box.setValue(0)
+        self.phase4_box.setMinimum(0); self.phase4_box.setMaximum(180); self.phase4_box.setValue(0)
         self.decay4_box.valueChanged.connect(self.set_decay4)
-        self.decay4_box.setMinimum(0); self.decay4_box.setMaximum(100); self.decay4_box.setValue(5)
+        self.decay4_box.setMinimum(0); self.decay4_box.setMaximum(.01); self.decay4_box.setValue(.002)
         self.p4 = False
         self.amp4 = 150
-        self.freq4 = 4 * 2 / np.pi
+        self.freq4 = 4
         self.phase4 = 0
-        self.decay4 = -5/200
+        self.decay4 = -.002
 
     def toggle_p1(self, state):
         self.p1 = state
@@ -307,16 +296,16 @@ class Harmonograph(Generator):
         self.amp4 = n
 
     def set_freq1(self, n):
-        self.freq1 = n * 2 / np.pi
+        self.freq1 = n
 
     def set_freq2(self, n):
-        self.freq2 = n * 2 / np.pi
+        self.freq2 = n
 
     def set_freq3(self, n):
-        self.freq3 = n * 2 / np.pi
+        self.freq3 = n
 
     def set_freq4(self, n):
-        self.freq4 = n * 2 / np.pi
+        self.freq4 = n
 
     def set_phase1(self, n):
         self.phase1 = n * np.pi / 180
@@ -331,22 +320,19 @@ class Harmonograph(Generator):
         self.phase4 = n * np.pi / 180
 
     def set_decay1(self, n):
-        self.decay1 = n / -200
+        self.decay1 = -n
 
     def set_decay2(self, n):
-        self.decay2 = n / -200
+        self.decay2 = -n
 
     def set_decay3(self, n):
-        self.decay3 = n / -200
+        self.decay3 = -n
 
     def set_decay4(self, n):
-        self.decay4 = n / -200
+        self.decay4 = -n
 
     def set_cmap(self, name):
         self.cmap = cm.get_cmap(name)
 
     def set_size(self, n):
         self.pen_size = n
-
-    def set_decay(self, n):
-        self.decay = -1 * n / 100

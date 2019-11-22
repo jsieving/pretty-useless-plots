@@ -5,19 +5,26 @@ from time import sleep
 from matplotlib import cm
 import numpy as np
 from random import randint
-# try:
-#     from objects.generator import Generator
-# except:
-#     from generator import Generator
+try:
+    from objects.generator import Generator
+except:
+    from generator import Generator
 
-class Branch():
+class Branch(Generator):
+    ''' A model which creates tree-like structures by generating copies of
+    itself with modified size, position and color in relation to the parent. '''
     def __init__(self, canvas, parent = None, child_no = 0):
-
+        ''' Create a branch - by default, it will be a head node, but upon
+        calling "go", more instances will be created with the creator as the
+        parent and a child number indicating position. '''
         self.canvas = canvas
         self.parent = parent
         self.child_no = child_no
 
-        if parent is not None: # necessarily inherited attributes
+        ''' if this is a child node, these attributes will be inherited from
+        the parent. If it were the head, these attributes would have been set
+        when the settings panel was created and called "reset". '''
+        if parent is not None:
             self.depth = parent.depth + 1
             self.max_depth = parent.max_depth
             self.draw_lines = parent.draw_lines
@@ -27,33 +34,39 @@ class Branch():
             self.fan = parent.fan
             self.size_grow = self.parent.size_grow
             self.length_grow = self.parent.length_grow
-        else:
+        else: # only these need to be set for the parent, and aren't in reset()
             self.x = canvas.w // 2
             self.y = canvas.h // 2
             self.angle = -90
             self.depth = 0
 
-    def step(self): # calculates parameters of current state
+    def step(self):
+        ''' calculates parameters of current state/node instance. Each of these
+        methods assign values as well as calculating them. '''
         self.calc_len()
         self.calc_size()
         self.calc_pos()
         self.calc_color()
 
-    def go(self): # propels model forward
-        self.step()
+    def go(self):
+        ''' Runs the generation and drawing of the tree. '''
+        self.step() # calculate current parameters
         self.children = []
-        if self.depth >= self.max_depth - 1:
+        if self.depth >= self.max_depth: # do not exceed max branch depth
             return
-        for i in range(self.num_children):
+        for i in range(self.num_children): # create children
             child = Branch(self.canvas, parent = self, child_no = i)
             self.children.append(child)
-            child.go()
-        self.draw()
+            child.go() # run child: calculate parameters, generate children, and draw
+        self.draw() # draw self last so that lines drawn by children are covered
 
-    def draw(self): # draws current state
+    def draw(self):
+        ''' Draws this node of the tree and updates the canvas. '''
         p = QPainter(self.canvas.pixmap())
         p.setPen(self.color)
         p.setBrush(self.color)
+
+        # draw a stem if appropriate
         if self.parent is not None and self.draw_lines:
             prevx = self.parent.x + self.parent.size * np.cos(self.angle * np.pi / 180)
             prevy = self.parent.y + self.parent.size * np.sin(self.angle * np.pi / 180)
@@ -61,16 +74,19 @@ class Branch():
         c = QPoint(self.x, self.y)
         p.drawEllipse(c, self.size, self.size)
         p.end()
+        # Repaint for every node, so gradual generation can be seen
         self.canvas.repaint()
 
     def calc_len(self):
+        ''' calculate and set branch length based on parent's branch length '''
         if self.depth > 1:
             self.length = self.parent.length * self.length_grow
         if self.depth == 1:
             self.length = self.parent.length
-        return self.length
 
-    def calc_pos(self): # calculate position based on parent's position
+    def calc_pos(self):
+        ''' calculate and set position based on parent's position, branch length
+        and child number '''
         if self.parent is not None:
             if self.num_children == 1:
                 dev = 0
@@ -79,19 +95,19 @@ class Branch():
             self.angle = self.parent.angle + self.parent.curve + dev
             self.x = self.parent.x + self.length * np.cos(self.angle * np.pi / 180)
             self.y = self.parent.y + self.length * np.sin(self.angle * np.pi / 180)
-        return self.x, self.y
 
-    def calc_color(self): # calculate position based on parent's position
+    def calc_color(self):
+        ''' Calculate and set color based on tree depth of this node '''
         r, g, b, a = self.cmap(self.depth/(self.max_depth - 1))
         self.color = QColor(r * 255, g * 255, b * 255)
-        return self.color
 
     def calc_size(self):
+        ''' Calculate and set size based on parent's size '''
         if self.parent is not None:
             self.size = self.parent.size * self.size_grow
-        return self.size
 
     def randomize(self):
+        ''' Randomize customizable settings of the tree model '''
         self.max_depth = randint(2, 12)
         if randint(0, 1) > 0:
             self.draw_lines = True
@@ -107,6 +123,7 @@ class Branch():
         self.length = randint(10, 400)
         self.length_grow = randint(10, 200) / 100
 
+        # set all setting controls to reflect this
         self.max_depth_box.setValue(self.max_depth)
         self.draw_lines_box.setCheckState(c)
         self.children_box.setValue(self.num_children)
@@ -118,6 +135,9 @@ class Branch():
         self.len_grow_box.setValue(self.length_grow)
 
     def init_menu_layout(self):
+        ''' create a menu layout for the settings of this model, reset/
+        initialize the model parameters, and pass this layout to the model
+        control widget. '''
         l = QGridLayout()
         self.cmap_label = QLabel("Color map:")
         self.cmap_box = QComboBox()
@@ -171,6 +191,8 @@ class Branch():
         return l
 
     def reset(self):
+        ''' reset all model parameters and their corresponding settings to
+        default values. '''
         self.cmap_box.setCurrentIndex(0)
         self.cmap = cm.get_cmap("viridis")
 
@@ -224,6 +246,7 @@ class Branch():
         self.fan_box.valueChanged.connect(self.set_fan)
         self.fan = 90
 
+    ''' functions for setting model parameters on interface events. '''
     def set_cmap(self, name):
         self.cmap = cm.get_cmap(name)
 
