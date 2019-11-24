@@ -70,6 +70,9 @@ class MainWindow(QMainWindow):
         clear_b = QPushButton('Clear screen')
         clear_b.clicked.connect(self.clear_screen)
 
+        save_b = QPushButton('Save')
+        save_b.clicked.connect(self.save_image)
+
         go_b = QPushButton('Go!')
         go_b.clicked.connect(self.on_go)
 
@@ -95,6 +98,7 @@ class MainWindow(QMainWindow):
         buttons_l.addWidget(restart_b)
         buttons_l.addWidget(reset_b)
         buttons_l.addWidget(clear_b)
+        buttons_l.addWidget(save_b)
         buttons_l.addWidget(go_b)
 
         self.setCentralWidget(main_w)
@@ -135,6 +139,19 @@ class MainWindow(QMainWindow):
             self.model.go()
         else:
             print("No model selected!")
+
+    def save_image(self):
+        ''' Opens a file saving dialog and saves the current canvas image to the
+        chosen file. '''
+        options = QFileDialog.Options()
+        file_name, _ = QFileDialog.getSaveFileName(self,"Save File","","Image files (*.jpeg *.jpg *.gif *.png *.JPEG *.JPG *.GIF *.PNG)", options=options)
+        if file_name:
+            pixels = self.canvas.pixmap()
+            s = pixels.save(file_name)
+        if s:
+            print("Image saved as %s" % file_name)
+        else:
+            print("Error saving %s" % file_name)
 
     def load_models(self):
         ''' For each model name listed in the __init__ method of this class,
